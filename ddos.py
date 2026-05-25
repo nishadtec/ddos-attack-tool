@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox, filedialog
 import threading
@@ -16,7 +15,6 @@ class LoadTesterGUI:
         self.root.geometry("900x700")
         self.root.resizable(True, True)
         
-        # Variables
         self.target_url = tk.StringVar()
         self.target_ip = tk.StringVar()
         self.port = tk.IntVar(value=80)
@@ -29,11 +27,9 @@ class LoadTesterGUI:
         self.setup_ui()
         
     def setup_ui(self):
-        # Main Frame
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Warning Label
         warning_frame = ttk.Frame(main_frame, relief="solid", borderwidth=2)
         warning_frame.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         warning_label = ttk.Label(warning_frame, 
@@ -41,41 +37,32 @@ class LoadTesterGUI:
                                  foreground="red", font=("Arial", 10, "bold"))
         warning_label.pack(pady=5)
         
-        # Target Configuration Frame
         target_frame = ttk.LabelFrame(main_frame, text="Target Configuration", padding="10")
         target_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
-        # Target URL
         ttk.Label(target_frame, text="Target URL (HTTP/HTTPS):").grid(row=0, column=0, sticky=tk.W, pady=5)
         ttk.Entry(target_frame, textvariable=self.target_url, width=50).grid(row=0, column=1, sticky=(tk.W, tk.E), pady=5, padx=(5, 0))
         
-        # Target IP
         ttk.Label(target_frame, text="Target IP:").grid(row=1, column=0, sticky=tk.W, pady=5)
         ttk.Entry(target_frame, textvariable=self.target_ip, width=50).grid(row=1, column=1, sticky=(tk.W, tk.E), pady=5, padx=(5, 0))
         
-        # Port
         ttk.Label(target_frame, text="Port:").grid(row=2, column=0, sticky=tk.W, pady=5)
         ttk.Spinbox(target_frame, from_=1, to=65535, textvariable=self.port, width=20).grid(row=2, column=1, sticky=tk.W, pady=5, padx=(5, 0))
         
-        # Attack Configuration Frame
         attack_frame = ttk.LabelFrame(main_frame, text="Attack Configuration", padding="10")
         attack_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         
-        # Attack Type
         ttk.Label(attack_frame, text="Test Type:").grid(row=0, column=0, sticky=tk.W, pady=5)
         attack_combo = ttk.Combobox(attack_frame, textvariable=self.attack_type, 
                                    values=["HTTP", "TCP", "Slow Loris", "ICMP"], state="readonly")
         attack_combo.grid(row=0, column=1, sticky=tk.W, pady=5, padx=(5, 0))
         
-        # Threads
         ttk.Label(attack_frame, text="Threads (1-1000):").grid(row=1, column=0, sticky=tk.W, pady=5)
         ttk.Spinbox(attack_frame, from_=1, to=1000, textvariable=self.threads, width=20).grid(row=1, column=1, sticky=tk.W, pady=5, padx=(5, 0))
         
-        # Duration
         ttk.Label(attack_frame, text="Duration (seconds):").grid(row=2, column=0, sticky=tk.W, pady=5)
         ttk.Spinbox(attack_frame, from_=5, to=3600, textvariable=self.duration, width=20).grid(row=2, column=1, sticky=tk.W, pady=5, padx=(5, 0))
         
-        # Control Buttons
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=3, column=0, columnspan=2, pady=10)
         
@@ -88,19 +75,16 @@ class LoadTesterGUI:
         ttk.Button(button_frame, text="Clear Log", command=self.clear_log, width=15).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Save Report", command=self.save_report, width=15).pack(side=tk.LEFT, padx=5)
         
-        # Log Area
         log_frame = ttk.LabelFrame(main_frame, text="Test Log", padding="10")
         log_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
         
         self.log_text = scrolledtext.ScrolledText(log_frame, width=100, height=20, wrap=tk.WORD)
         self.log_text.pack(fill=tk.BOTH, expand=True)
         
-        # Status Bar
         self.status_var = tk.StringVar(value="Ready")
         status_bar = ttk.Label(self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W)
         status_bar.grid(row=1, column=0, sticky=(tk.W, tk.E))
         
-        # Configure grid weights
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(1, weight=1)
@@ -116,7 +100,6 @@ class LoadTesterGUI:
         self.log_text.insert(tk.END, f"[{timestamp}] [{level}] {message}\n", color)
         self.log_text.see(tk.END)
         
-        # Configure tags
         self.log_text.tag_config("orange", foreground="orange")
         self.log_text.tag_config("red", foreground="red")
         self.log_text.tag_config("green", foreground="green")
@@ -134,7 +117,6 @@ class LoadTesterGUI:
             self.log(f"Report saved to {filename}", "SUCCESS")
             
     def start_attack(self):
-        # Validation
         if not self.target_url.get() and not self.target_ip.get():
             messagebox.showerror("Error", "Please enter Target URL or IP!")
             return
@@ -144,7 +126,6 @@ class LoadTesterGUI:
             if not result:
                 return
         
-        # Ethical warning
         if not messagebox.askyesno("Ethical Confirmation", 
                                    "Do you have WRITTEN PERMISSION to test this target?\n\n"
                                    "Unauthorized testing is ILLEGAL and may result in:\n"
@@ -160,7 +141,6 @@ class LoadTesterGUI:
         self.log(f"Starting test on {self.target_url.get() or self.target_ip.get()}", "WARNING")
         self.log(f"Threads: {self.threads.get()}, Duration: {self.duration.get()}s, Type: {self.attack_type.get()}", "INFO")
         
-        # Start attack thread
         attack_thread = threading.Thread(target=self.run_attack)
         attack_thread.daemon = True
         attack_thread.start()
@@ -251,7 +231,6 @@ class LoadTesterGUI:
         
         def slowloris():
             socks = []
-            # Create partial connections
             for _ in range(100):
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -262,7 +241,6 @@ class LoadTesterGUI:
                 except:
                     pass
                     
-            # Keep connections alive
             while not self.stop_flag:
                 for sock in socks:
                     try:
